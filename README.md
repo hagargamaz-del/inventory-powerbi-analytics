@@ -1,82 +1,57 @@
-# End-to-End Inventory Analytics Dashboard Using Python, SQL Server, and Power BI
+# Inventory Analytics Dashboard Using Python, SQL Server, and Power BI
 
-## 1. Project Overview
+## Project Overview
 
-This project is an end-to-end inventory analytics solution built using **Python**, **SQL Server**, and **Power BI**.
+This project is an end-to-end inventory analytics dashboard built using **Python**, **SQL Server**, and **Power BI**.
 
-The goal of the project is to analyze sales, profitability, inventory levels, product performance, stock risk, and store performance for a retail toy store chain.
+The project analyzes retail sales and inventory data for a toy store chain to track revenue, profit, product performance, inventory risk, stock coverage, and store performance.
 
-Instead of connecting raw CSV files directly to Power BI, this project follows a complete analytics workflow:
+Instead of connecting raw CSV files directly to Power BI, the project follows a complete analytics workflow:
 
 ```text
 Raw CSV Files
     ↓
-Python Data Cleaning and Validation
+Python Data Cleaning
     ↓
-SQL Server Relational Database
+SQL Server Database
     ↓
-T-SQL Analytical Views
+T-SQL Views
     ↓
-Power BI Data Model
-    ↓
-Interactive Power BI Dashboard
+Power BI Dashboard
 ```
 
-This structure makes the project stronger because it demonstrates data cleaning, database modeling, SQL analysis, DAX calculations, and dashboard storytelling.
+---
+
+## Business Objectives
+
+The dashboard was built to answer key business questions:
+
+- What are the total revenue, profit, profit margin, and units sold?
+- Which products and categories generate the highest revenue and profit?
+- Which products are out of stock or at risk of stockout?
+- Which products are dead stock candidates?
+- Which stores and locations perform best?
+- Which store-product combinations require inventory action?
 
 ---
 
-## 2. Business Problem
+## Tools Used
 
-Retail businesses need to monitor both sales performance and inventory health.
-
-High revenue alone is not enough. A business also needs to understand:
-
-- Which products generate the highest revenue?
-- Which products generate the highest profit?
-- Which stores perform best?
-- Which product categories are strongest?
-- Which products are out of stock?
-- Which products are at risk of stockout?
-- Which products have stock but no recent demand?
-- Which stores have strong sales but possible inventory problems?
-
-This dashboard was built to answer these questions and support data-driven inventory and sales decisions.
+| Tool | Purpose |
+|---|---|
+| Python | Data cleaning and preprocessing |
+| Pandas | Data transformation |
+| SQL Server | Relational database storage |
+| T-SQL | Tables, views, and business queries |
+| Power BI | Dashboard and reporting |
+| DAX | Measures and KPIs |
+| GitHub | Version control and documentation |
 
 ---
 
-## 3. Business Objectives
+## Dataset
 
-The project aims to:
-
-- Track total revenue, profit, profit margin, units sold, and inventory value.
-- Analyze monthly revenue trends.
-- Identify top-performing products by revenue and profit.
-- Compare product categories by revenue and profitability.
-- Detect out-of-stock, high-risk, medium-risk, and dead-stock items.
-- Analyze stock coverage based on recent sales.
-- Compare store performance by city and store location type.
-- Provide an operational inventory action list for restocking and stock optimization.
-
----
-
-## 4. Tools and Technologies
-
-| Tool       | Purpose                                     |
-| ---------- | ------------------------------------------- |
-| Python     | Data cleaning and validation                |
-| Pandas     | Data transformation and preprocessing       |
-| SQL Server | Relational database storage                 |
-| T-SQL      | Table creation, views, and business queries |
-| Power BI   | Dashboard development                       |
-| DAX        | KPI measures and analytical calculations    |
-| GitHub     | Project documentation and version control   |
-
----
-
-## 5. Dataset
-
-The dataset used is a retail sales and inventory dataset for a toy store chain.
+The dataset contains retail sales and inventory data for a toy store chain.
 
 Main files:
 
@@ -87,24 +62,15 @@ stores.csv
 inventory.csv
 ```
 
-### Dataset Tables
+The full raw and cleaned CSV files are **not included** in this repository to avoid redistributing the original dataset.
 
-| File            | Description                                       |
-| --------------- | ------------------------------------------------- |
-| `sales.csv`     | Daily sales transactions                          |
-| `products.csv`  | Product names, categories, cost, and price        |
-| `stores.csv`    | Store names, cities, locations, and opening dates |
-| `inventory.csv` | Current stock on hand by store and product        |
-
-The raw and cleaned CSV files are not included in this repository to avoid redistributing the original dataset.
-
-Users should download the dataset separately and place the files inside:
+Place the raw files inside:
 
 ```text
 data/raw/
 ```
 
-Expected raw files:
+Expected files:
 
 ```text
 data/raw/sales.csv
@@ -115,7 +81,7 @@ data/raw/inventory.csv
 
 ---
 
-## 6. Project Structure
+## Project Structure
 
 ```text
 inventory-powerbi-analytics/
@@ -123,12 +89,8 @@ inventory-powerbi-analytics/
 ├── data/
 │   ├── raw/
 │   │   └── README.md
-│   │
 │   └── cleaned/
 │       └── README.md
-│
-├── notebooks/
-│   └── inventory_cleaning_eda.ipynb
 │
 ├── python/
 │   ├── 01_clean_data.py
@@ -161,812 +123,225 @@ inventory-powerbi-analytics/
 
 ---
 
-## 7. Python Data Cleaning
+## Data Cleaning
 
-Python was used to prepare the raw CSV files before loading them into SQL Server.
+Python was used to clean and validate the raw CSV files before loading them into SQL Server.
 
-Main cleaning script:
+Main script:
 
 ```text
 python/01_clean_data.py
 ```
 
-### Cleaning Steps
+Cleaning steps included:
 
-The cleaning script performs the following tasks:
-
-1. Loads raw CSV files.
-2. Standardizes column names.
-3. Converts column names to lowercase snake case.
-4. Converts date columns to date format.
-5. Cleans currency columns.
-6. Removes duplicate rows.
-7. Checks missing values.
-8. Validates primary keys.
-9. Validates foreign key relationships.
-10. Checks business logic constraints.
-11. Creates derived columns.
-12. Exports cleaned CSV files.
-
-### Main Validations
-
-The script checks that:
-
-- `product_id` is unique in the products table.
-- `store_id` is unique in the stores table.
-- `sale_id` is unique in the sales table.
-- All product IDs in sales exist in the products table.
-- All store IDs in sales exist in the stores table.
-- All product IDs in inventory exist in the products table.
-- All store IDs in inventory exist in the stores table.
-- Sales units are not negative.
-- Stock on hand is not negative.
-- Product price is not lower than product cost.
-
-### Derived Columns
-
-The Python script creates:
-
-| Column            | Description                            |
-| ----------------- | -------------------------------------- |
-| `unit_profit`     | Product price minus product cost       |
-| `year`            | Sales year                             |
-| `month`           | Sales month                            |
-| `year_month`      | Year-month field for reporting         |
-| `store_age_years` | Store age calculated from opening date |
+- Standardizing column names
+- Converting date columns
+- Cleaning currency columns
+- Removing duplicates
+- Checking missing values
+- Validating primary keys and foreign keys
+- Creating derived columns such as `unit_profit`, `year`, `month`, and `year_month`
+- Exporting cleaned CSV files
 
 ---
 
-## 8. SQL Server Database Design
+## SQL Server Database
 
-The cleaned data is loaded into SQL Server using Python and SQLAlchemy.
-
-Main loading script:
+The cleaned data was loaded into SQL Server using:
 
 ```text
 python/02_load_to_sqlserver.py
 ```
 
-The SQL Server database follows a star-schema style model.
+The database uses a star-schema style model.
 
 ### Fact Tables
 
-| Table            | Description                          |
-| ---------------- | ------------------------------------ |
-| `fact_sales`     | Sales transaction data               |
-| `fact_inventory` | Store-product inventory stock levels |
+- `fact_sales`
+- `fact_inventory`
 
 ### Dimension Tables
 
-| Table          | Description                      |
-| -------------- | -------------------------------- |
-| `dim_products` | Product attributes               |
-| `dim_stores`   | Store attributes                 |
-| `dim_date`     | Date dimension for time analysis |
+- `dim_products`
+- `dim_stores`
+- `dim_date`
+
+### Main Relationships
+
+| Fact Table | Column | Dimension Table | Column |
+|---|---|---|---|
+| `fact_sales` | `product_id` | `dim_products` | `product_id` |
+| `fact_sales` | `store_id` | `dim_stores` | `store_id` |
+| `fact_sales` | `sale_date` | `dim_date` | `date_key` |
+| `fact_inventory` | `product_id` | `dim_products` | `product_id` |
+| `fact_inventory` | `store_id` | `dim_stores` | `store_id` |
 
 ---
 
-## 9. SQL Server Schema
+## SQL Views
 
-### `dim_products`
+The project includes analytical SQL views used for reporting and business analysis:
 
-```text
-product_id
-product_name
-product_category
-product_cost
-product_price
-unit_profit
-```
-
-### `dim_stores`
-
-```text
-store_id
-store_name
-store_city
-store_location
-store_open_date
-store_age_years
-```
-
-### `fact_sales`
-
-```text
-sale_id
-sale_date
-store_id
-product_id
-units
-year
-month
-year_month
-```
-
-### `fact_inventory`
-
-```text
-store_id
-product_id
-stock_on_hand
-```
-
-### `dim_date`
-
-```text
-date_key
-year
-month_number
-month_name
-year_month
-quarter_number
-day_of_week_number
-day_name
-```
+| View | Purpose |
+|---|---|
+| `vw_sales_detail` | Detailed sales, revenue, cost, and profit analysis |
+| `vw_inventory_status` | Stock status, inventory value, and stock availability |
+| `vw_product_performance` | Product-level revenue, profit, and units sold |
+| `vw_store_performance` | Store-level revenue, profit, and margin |
+| `vw_stock_risk` | Stock coverage, stock risk, and dead-stock detection |
 
 ---
 
-## 10. Data Model Relationships
+## Inventory Risk Logic
 
-The data model uses these relationships:
+Inventory risk is calculated using current stock and sales activity during the last 90 days.
 
-| Fact Table       | Column       | Dimension Table | Column       |
-| ---------------- | ------------ | --------------- | ------------ |
-| `fact_sales`     | `product_id` | `dim_products`  | `product_id` |
-| `fact_sales`     | `store_id`   | `dim_stores`    | `store_id`   |
-| `fact_sales`     | `sale_date`  | `dim_date`      | `date_key`   |
-| `fact_inventory` | `product_id` | `dim_products`  | `product_id` |
-| `fact_inventory` | `store_id`   | `dim_stores`    | `store_id`   |
-
-Relationship type:
-
-```text
-Many-to-one
-Single filter direction
-```
-
-This model allows Power BI slicers and visuals to filter sales and inventory measures correctly.
-
----
-
-## 11. SQL Views
-
-The project uses SQL views to simplify analysis and reporting.
-
-### `vw_sales_detail`
-
-Combines sales, products, stores, and date information.
-
-Used for:
-
-- Revenue analysis
-- Profit analysis
-- Product performance
-- Store performance
-- Monthly trend analysis
-
-Main calculated fields:
-
-```text
-revenue = units * product_price
-cost = units * product_cost
-profit = units * unit_profit
-```
-
----
-
-### `vw_inventory_status`
-
-Combines inventory, product, and store information.
-
-Used for:
-
-- Stock-on-hand analysis
-- Inventory cost value
-- Inventory retail value
-- Low-stock analysis
-- Out-of-stock analysis
-
-Main calculated fields:
-
-```text
-inventory_cost_value = stock_on_hand * product_cost
-inventory_retail_value = stock_on_hand * product_price
-stock_status = Out of Stock / Low Stock / Available
-```
-
----
-
-### `vw_product_performance`
-
-Aggregates sales performance by product.
-
-Used for:
-
-- Product revenue
-- Product profit
-- Units sold
-- Product profit margin
-
----
-
-### `vw_store_performance`
-
-Aggregates sales performance by store.
-
-Used for:
-
-- Store revenue
-- Store profit
-- Store margin
-- Store ranking
-
----
-
-### `vw_stock_risk`
-
-Calculates stock risk using current stock and units sold during the last 90 days.
-
-Used for:
-
-- Stock coverage days
-- High-risk item detection
-- Medium-risk item detection
-- Dead-stock detection
-- Inventory action list
-
----
-
-## 12. Inventory Risk Logic
-
-Inventory risk is calculated using stock on hand and sales activity during the last 90 days.
-
-| Risk Status          | Logic                                     | Recommended Action         |
-| -------------------- | ----------------------------------------- | -------------------------- |
-| Out of Stock         | Stock on hand = 0                         | Immediate Restock          |
-| High Risk            | Stock coverage < 7 days                   | Restock Soon               |
-| Medium Risk          | Stock coverage < 14 days                  | Monitor Closely            |
+| Risk Status | Logic | Recommended Action |
+|---|---|---|
+| Out of Stock | Stock on hand = 0 | Immediate Restock |
+| High Risk | Stock coverage < 7 days | Restock Soon |
+| Medium Risk | Stock coverage < 14 days | Monitor Closely |
 | Dead Stock Candidate | Stock exists but no sales in last 90 days | Discount or Transfer Stock |
-| Healthy              | Sufficient stock coverage                 | No Action Needed           |
+| Healthy | Sufficient stock coverage | No Action Needed |
 
-### Stock Coverage Formula
+Stock coverage formula:
 
 ```text
 Stock Coverage Days = Stock On Hand / Average Daily Units Sold in Last 90 Days
 ```
 
-Where:
+---
 
-```text
-Average Daily Units Sold = Units Sold in Last 90 Days / 90
-```
+## Power BI Dashboard
 
-This logic converts raw inventory numbers into operational business actions.
+The Power BI dashboard contains seven pages.
 
 ---
 
-## 13. Power BI Data Model
+### 1. Executive Overview
 
-Power BI connects to SQL Server using **Import mode**.
+High-level view of sales, profit, inventory value, monthly trends, category revenue, city profit, and stock status.
 
-Imported tables/views include:
+<img width="1373" height="744" alt="Inventory   Sales Performance Dashboard" src="https://github.com/user-attachments/assets/1f799fd4-cd8d-4037-bd7b-d111d8a74609" />
 
-```text
-dim_products
-dim_stores
-dim_date
-fact_sales
-fact_inventory
-vw_stock_risk
-vw_inventory_status
-```
-
-The base Power BI model uses fact and dimension tables for most calculations.
-
-The `vw_stock_risk` view is used for inventory risk pages because it already contains stock coverage and risk classification logic.
 
 ---
 
-## 14. DAX Measures
+### 2. Product Performance Analysis
 
-### Sales Measures
-
-```DAX
-Total Units Sold =
-SUM(fact_sales[units])
-```
-
-```DAX
-Total Revenue =
-SUMX(
-    fact_sales,
-    fact_sales[units] * RELATED(dim_products[product_price])
-)
-```
-
-```DAX
-Total Cost =
-SUMX(
-    fact_sales,
-    fact_sales[units] * RELATED(dim_products[product_cost])
-)
-```
-
-```DAX
-Total Profit =
-[Total Revenue] - [Total Cost]
-```
-
-```DAX
-Profit Margin =
-DIVIDE(
-    [Total Profit],
-    [Total Revenue]
-)
-```
-
-```DAX
-Average Selling Price =
-DIVIDE(
-    [Total Revenue],
-    [Total Units Sold]
-)
-```
+Analysis of top products by revenue, top products by profit, and revenue/profit by product category.
+<img width="1377" height="755" alt="Product Performance Analysis" src="https://github.com/user-attachments/assets/74850d4a-0cc3-4d88-a5ce-728641e8361d" />
 
 ---
 
-### Inventory Measures
+### 3. Product Profitability
 
-```DAX
-Total Stock =
-SUM(fact_inventory[stock_on_hand])
-```
+Scatter analysis of product revenue vs profit margin to identify strong products, low-margin products, and growth opportunities.
 
-```DAX
-Inventory Cost Value =
-SUMX(
-    fact_inventory,
-    fact_inventory[stock_on_hand] * RELATED(dim_products[product_cost])
-)
-```
-
-```DAX
-Inventory Retail Value =
-SUMX(
-    fact_inventory,
-    fact_inventory[stock_on_hand] * RELATED(dim_products[product_price])
-)
-```
-
-```DAX
-Potential Inventory Profit =
-[Inventory Retail Value] - [Inventory Cost Value]
-```
+<img width="1371" height="751" alt="Product Profitability Analysis" src="https://github.com/user-attachments/assets/af1f4849-6d5e-42f3-b711-8c6af1c2278d" />
 
 ---
 
-### Product Analysis Measures
+### 4. Inventory Risk Analysis
 
-```DAX
-Revenue Share % =
-DIVIDE(
-    [Total Revenue],
-    CALCULATE(
-        [Total Revenue],
-        ALLSELECTED(dim_products[product_name])
-    )
-)
-```
+Summary of stock risk, critical stock items, dead stock, and average stock coverage by category.
 
-```DAX
-Sales to Stock Ratio =
-DIVIDE(
-    [Total Units Sold],
-    [Total Stock]
-)
-```
-
-```DAX
-Product Rank by Revenue =
-RANKX(
-    ALLSELECTED(dim_products[product_name]),
-    [Total Revenue],
-    ,
-    DESC,
-    DENSE
-)
-```
+<img width="1371" height="750" alt="Inventory Risk Analysis" src="https://github.com/user-attachments/assets/2ce31f01-5773-4b39-8c78-87b8a05cafb5" />
 
 ---
 
-### Store Analysis Measures
+### 5. Inventory Risk Details
 
-```DAX
-Number of Stores =
-DISTINCTCOUNT(dim_stores[store_id])
-```
+Operational action list showing exact products and stores that require restocking, monitoring, discounting, or stock transfer.
 
-```DAX
-Store Rank by Revenue =
-RANKX(
-    ALLSELECTED(dim_stores[store_name]),
-    [Total Revenue],
-    ,
-    DESC,
-    DENSE
-)
-```
-
-```DAX
-Store Rank by Profit =
-RANKX(
-    ALLSELECTED(dim_stores[store_name]),
-    [Total Profit],
-    ,
-    DESC,
-    DENSE
-)
-```
+<img width="1383" height="729" alt="Inventory Risk Details (2)" src="https://github.com/user-attachments/assets/75aece14-57d8-4953-b09f-14af50dc0998" />
 
 ---
 
-### Inventory Risk Measures
+### 6. Store Performance Analysis
 
-```DAX
-Inventory Item Count =
-COUNTROWS(vw_stock_risk)
-```
+Store-level summary comparing revenue, profit, and performance by store location.
 
-```DAX
-Risk Page Total Stock =
-SUM(vw_stock_risk[stock_on_hand])
-```
-
-```DAX
-Out of Stock Items =
-CALCULATE(
-    COUNTROWS(vw_stock_risk),
-    vw_stock_risk[stock_risk_status] = "Out of Stock"
-)
-```
-
-```DAX
-High Risk Items =
-CALCULATE(
-    COUNTROWS(vw_stock_risk),
-    vw_stock_risk[stock_risk_status] = "High Risk"
-)
-```
-
-```DAX
-Medium Risk Items =
-CALCULATE(
-    COUNTROWS(vw_stock_risk),
-    vw_stock_risk[stock_risk_status] = "Medium Risk"
-)
-```
-
-```DAX
-Dead Stock Candidates =
-CALCULATE(
-    COUNTROWS(vw_stock_risk),
-    vw_stock_risk[stock_risk_status] = "Dead Stock Candidate"
-)
-```
-
-```DAX
-Critical Stock Items =
-CALCULATE(
-    COUNTROWS(vw_stock_risk),
-    vw_stock_risk[stock_risk_status] IN {"Out of Stock", "High Risk"}
-)
-```
-
-```DAX
-Average Stock Coverage Days =
-AVERAGE(vw_stock_risk[stock_coverage_days])
-```
+<img width="1368" height="748" alt="Store Performance Analysis" src="https://github.com/user-attachments/assets/b1cf96b0-6e1a-4df2-b034-66c31e9d073d" />
 
 ---
 
-## 15. Power BI Dashboard Pages
+### 7. Store Details and Operational Review
 
-The Power BI report contains seven pages.
+Store-level drill-down with a matrix and scatter plot comparing store revenue vs profit margin.
 
----
-
-### Page 1: Executive Overview
-
-Purpose:
-
-Provides a high-level business overview.
-
-Main visuals:
-
-- KPI cards
-- Monthly revenue trend
-- Revenue by product category
-- Profit by store city
-- Stock status overview
-
-Main KPIs:
-
-- Total Revenue
-- Total Profit
-- Profit Margin
-- Total Units Sold
-- Total Stock
-- Inventory Cost Value
-- Inventory Retail Value
-
-Screenshot:
-
-![Executive Overview](images/executive_overview.png)
+<img width="1373" height="751" alt="Store Details" src="https://github.com/user-attachments/assets/6fdf7ab2-b85d-4eff-b815-23fd8ff265c9" />
 
 ---
 
-### Page 2: Product Performance Analysis
+## Key Insights
 
-Purpose:
-
-Analyzes product and category performance.
-
-Main visuals:
-
-- Top 10 products by revenue
-- Top 10 products by profit
-- Revenue and profit by product category
-- Product performance details matrix
-
-Screenshot:
-
-![Product Performance](images/product_performance.png)
-
----
-
-### Page 3: Product Profitability
-
-Purpose:
-
-Analyzes the relationship between revenue and profit margin.
-
-Main visuals:
-
-- Product revenue vs profit margin scatter plot
-- Low-margin product analysis
-- High-revenue low-margin product analysis
-
-Interpretation:
-
-- High revenue and high margin products are strong performers.
-- High revenue but low margin products may need cost or pricing review.
-- Low revenue but high margin products may be growth opportunities.
-- Low revenue and low margin products are weak performers.
-
-Screenshot:
-
-![Product Profitability](images/product_profitability.png)
-
----
-
-### Page 4: Inventory Risk Analysis
-
-Purpose:
-
-Summarizes inventory health.
-
-Main visuals:
-
-- Inventory items by risk status
-- Dead stock quantity by category
-- Critical stock items by city
-- Average stock coverage days by category
-
-Main KPIs:
-
-- Total Stock
-- Critical Stock Items
-- Out of Stock Items
-- Dead Stock Candidates
-- Average Stock Coverage Days
-
-Screenshot:
-
-![Inventory Risk Analysis](images/inventory_risk_analysis.png)
-
----
-
-### Page 5: Inventory Risk Details
-
-Purpose:
-
-Provides an operational action list.
-
-Main columns:
-
-- Risk Status
-- Recommended Action
-- Store
-- City
-- Location
-- Product
-- Category
-- Stock
-- Units Sold in Last 90 Days
-- Coverage Days
-
-Screenshot:
-
-![Inventory Risk Details](images/inventory_risk_details.png)
-
----
-
-### Page 6: Store Performance Analysis
-
-Purpose:
-
-Summarizes store performance by revenue, profit, and location type.
-
-Main visuals:
-
-- Top 10 stores by revenue and profit
-- Revenue and profit by store location
-
-Main KPIs:
-
-- Total Revenue
-- Total Profit
-- Profit Margin
-- Number of Stores
-- Inventory Cost Value
-
-Screenshot:
-
-![Store Performance](images/store_performance.png)
-
----
-
-### Page 7: Store Details and Operational Review
-
-Purpose:
-
-Provides store-level drill-down and profitability review.
-
-Main visuals:
-
-- Store performance matrix
-- Store revenue vs profit margin scatter plot
-
-Scatter plot interpretation:
-
-- High revenue and high margin stores are best-performing stores.
-- High revenue but weaker margin stores may need cost review.
-- Low revenue but strong margin stores may be growth opportunities.
-- Low revenue and low margin stores may need operational review.
-
-Screenshot:
-
-![Store Details](images/store_details.png)
-
----
-
-## 16. Key Business Insights
-
-The dashboard provides the following insights:
-
-- Total revenue reached 14.44M with a profit margin of 27.79%.
+- Total revenue reached **14.44M** with a profit margin of **27.79%**.
 - Product performance varies significantly across categories.
 - Some products generate high revenue but weaker profit margins.
-- Inventory risk exists in the form of out-of-stock, high-risk, and dead-stock items.
-- Dead stock candidates are products with stock available but no recent sales activity.
-- Store performance differs across location types.
+- Inventory risk exists through out-of-stock, high-risk, and dead-stock items.
+- Dead stock candidates are products with stock available but no recent sales.
+- Store performance differs by city and location type.
 - Downtown stores generate the highest revenue and profit.
-- Store-level scatter analysis helps identify high-performing and underperforming stores.
-- Inventory risk analysis provides an operational list of products requiring restocking, monitoring, discounting, or transfer.
+- The dashboard supports both executive monitoring and operational inventory actions.
 
 ---
 
-## 17. How to Run the Project
+## How to Run the Project
 
-### Step 1: Clone the Repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/inventory-powerbi-analytics.git
 cd inventory-powerbi-analytics
 ```
 
-Replace `YOUR_USERNAME` with your GitHub username.
-
----
-
-### Step 2: Create a Virtual Environment
+### 2. Create and activate virtual environment
 
 ```bash
 python -m venv venv
 venv\Scripts\activate
 ```
 
----
-
-### Step 3: Install Dependencies
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
+### 4. Add raw data
 
-### Step 4: Add Raw Data
-
-Download the dataset and place the files inside:
+Place the raw CSV files inside:
 
 ```text
 data/raw/
 ```
 
-Expected files:
-
-```text
-sales.csv
-products.csv
-stores.csv
-inventory.csv
-```
-
----
-
-### Step 5: Clean the Data
+### 5. Clean the data
 
 ```bash
 python python/01_clean_data.py
 ```
 
-This generates cleaned files inside:
+### 6. Create SQL Server database and tables
 
-```text
-data/cleaned/
-```
-
-Expected cleaned files:
-
-```text
-clean_sales.csv
-clean_products.csv
-clean_stores.csv
-clean_inventory.csv
-```
-
----
-
-### Step 6: Create SQL Server Database
-
-Open SQL Server Management Studio and run:
+Run the SQL scripts in SQL Server Management Studio in this order:
 
 ```text
 sql/01_create_database.sql
-```
-
----
-
-### Step 7: Create SQL Server Tables
-
-Run:
-
-```text
 sql/02_create_tables.sql
 ```
 
----
+### 7. Load data into SQL Server
 
-### Step 8: Load Data into SQL Server
-
-Update the SQL Server connection values inside:
+Update the SQL Server connection values in:
 
 ```text
 python/02_load_to_sqlserver.py
 ```
 
-Example connection values:
+Example:
 
 ```python
 SERVER = r"localhost\SQLEXPRESS"
@@ -980,39 +355,17 @@ Then run:
 python python/02_load_to_sqlserver.py
 ```
 
----
-
-### Step 9: Create Date Dimension
+### 8. Create date dimension and SQL views
 
 Run:
 
 ```text
 sql/03_create_date_dimension.sql
-```
-
----
-
-### Step 10: Create SQL Views
-
-Run:
-
-```text
 sql/04_create_views.sql
-```
-
----
-
-### Step 11: Run Business Queries
-
-Optional validation queries are available in:
-
-```text
 sql/05_business_queries.sql
 ```
 
----
-
-### Step 12: Open Power BI Dashboard
+### 9. Open Power BI file
 
 Open:
 
@@ -1024,11 +377,9 @@ Refresh the data connection if needed.
 
 ---
 
-## 18. GitHub Notes
+## GitHub Notes
 
-The full raw and cleaned CSV files are not included in the repository.
-
-The `.gitignore` excludes:
+The repository excludes raw and cleaned CSV files using `.gitignore`:
 
 ```text
 data/raw/*.csv
@@ -1042,18 +393,15 @@ The repository includes:
 
 - Python scripts
 - SQL scripts
-- Power BI file
+- Power BI dashboard file
 - Dashboard screenshots
 - Project documentation
-- Folder-level README files for data instructions
 
 ---
+<img width="1373" height="744" alt="Inventory   Sales Performance Dashboard" src="https://github.com/user-attachments/assets/a4706746-e8df-49e8-ae7d-73e5a3407bd2" />
 
 
----
 
-## 22. Author
+## Author
 
 **Hagar Tawfik**
-
-
