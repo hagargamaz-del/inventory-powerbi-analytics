@@ -398,7 +398,6 @@ The repository includes:
 - Project documentation
 
 ---
-<img width="1373" height="744" alt="Inventory   Sales Performance Dashboard" src="https://github.com/user-attachments/assets/a4706746-e8df-49e8-ae7d-73e5a3407bd2" />
 
 
 
